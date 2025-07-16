@@ -1,0 +1,244 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()" fill="clear">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ pageTitle }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="onSubmit()" [disabled]="!materialForm.valid">
+        <ion-icon name="save"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <form [formGroup]="materialForm" (ngSubmit)="onSubmit()">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Información Básica</ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-md="6">
+              <ion-item fill="outline">
+                <ion-label position="floating">Código *</ion-label>
+                <ion-input
+                  formControlName="code"
+                  placeholder=""
+                  [class.ion-invalid]="isFieldInvalid('code')"
+                  [class.ion-touched]="materialForm.get('code')?.touched">
+                </ion-input>
+              </ion-item>
+              <div *ngIf="isFieldInvalid('code')" class="error-message">
+                {{ getFieldError('code') }}
+              </div>
+            </ion-col>
+            
+            <ion-col size="12" size-md="6">
+              <ion-item fill="outline">
+                <ion-label position="floating">Nombre *</ion-label>
+                <ion-input
+                  formControlName="name"
+                  placeholder=""
+                  [class.ion-invalid]="isFieldInvalid('name')"
+                  [class.ion-touched]="materialForm.get('name')?.touched">
+                </ion-input>
+              </ion-item>
+              <div *ngIf="isFieldInvalid('name')" class="error-message">
+                {{ getFieldError('name') }}
+              </div>
+            </ion-col>
+          </ion-row>
+          
+          <ion-row>
+            <ion-col size="12">
+              <ion-item fill="outline">
+                <ion-label position="floating">Descripción *</ion-label>
+                <ion-textarea
+                  formControlName="description"
+                  placeholder=""
+                  rows="3"
+                  [class.ion-invalid]="isFieldInvalid('description')"
+                  [class.ion-touched]="materialForm.get('description')?.touched">
+                </ion-textarea>
+              </ion-item>
+              <div *ngIf="isFieldInvalid('description')" class="error-message">
+                {{ getFieldError('description') }}
+              </div>
+            </ion-col>
+          </ion-row>
+          
+          <ion-row>
+            <ion-col size="12" size-md="6">
+              <ion-item fill="outline">
+                <ion-label position="floating">Categoría *</ion-label>
+                <ion-select
+                  formControlName="category"
+                  placeholder=""
+                  [class.ion-invalid]="isFieldInvalid('category')"
+                  [class.ion-touched]="materialForm.get('category')?.touched">
+                  <ion-select-option *ngFor="let category of categories" [value]="category">
+                    {{ category }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <div *ngIf="isFieldInvalid('category')" class="error-message">
+                {{ getFieldError('category') }}
+              </div>
+            </ion-col>
+            
+            <ion-col size="12" size-md="6">
+              <ion-item fill="outline">
+                <ion-label position="floating">Unidad de Medida *</ion-label>
+                <ion-select
+                  formControlName="unit"
+                  placeholder="Seleccionar unidad"
+                  [class.ion-invalid]="isFieldInvalid('unit')"
+                  [class.ion-touched]="materialForm.get('unit')?.touched">
+                  <ion-select-option *ngFor="let unit of units" [value]="unit">
+                    {{ unit }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <div *ngIf="isFieldInvalid('unit')" class="error-message">
+                {{ getFieldError('unit') }}
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Stock e Inventario</ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-md="6">
+              <ion-item fill="outline">
+                <ion-label position="floating">Stock Actual *</ion-label>
+                <ion-input
+                  type="number"
+                  formControlName="currentStock"
+                  placeholder="0"
+                  min="0"
+                  [class.ion-invalid]="isFieldInvalid('currentStock')"
+                  [class.ion-touched]="materialForm.get('currentStock')?.touched">
+                </ion-input>
+              </ion-item>
+              <div *ngIf="isFieldInvalid('currentStock')" class="error-message">
+                {{ getFieldError('currentStock') }}
+              </div>
+            </ion-col>
+            
+            <ion-col size="12" size-md="6">
+              <ion-item fill="outline">
+                <ion-label position="floating">Stock Mínimo *</ion-label>
+                <ion-input
+                  type="number"
+                  formControlName="minimumStock"
+                  placeholder="0"
+                  min="0"
+                  [class.ion-invalid]="isFieldInvalid('minimumStock')"
+                  [class.ion-touched]="materialForm.get('minimumStock')?.touched">
+                </ion-input>
+              </ion-item>
+              <div *ngIf="isFieldInvalid('minimumStock')" class="error-message">
+                {{ getFieldError('minimumStock') }}
+              </div>
+            </ion-col>
+          </ion-row>
+          
+          <ion-row>
+            <ion-col size="12">
+              <ion-item fill="outline">
+                <ion-label position="floating">Ubicación *</ion-label>
+                <ion-input
+                  formControlName="location"
+                  placeholder=""
+                  [class.ion-invalid]="isFieldInvalid('location')"
+                  [class.ion-touched]="materialForm.get('location')?.touched">
+                </ion-input>
+              </ion-item>
+              <div *ngIf="isFieldInvalid('location')" class="error-message">
+                {{ getFieldError('location') }}
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Información Adicional</ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-md="6">
+              <ion-item fill="outline">
+                <ion-label position="floating">Precio Unitario</ion-label>
+                <ion-input
+                  type="number"
+                  formControlName="price"
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            
+            <ion-col size="12" size-md="6">
+              <ion-item fill="outline">
+                <ion-label position="floating">Proveedor</ion-label>
+                <ion-input
+                  formControlName="supplier"
+                  placeholder="">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          
+          <ion-row>
+            <ion-col size="12">
+              <ion-item>
+                <ion-checkbox formControlName="isActive"></ion-checkbox>
+                <ion-label style="margin-left: 10px;">Material activo</ion-label>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+
+    <div class="form-actions">
+      <ion-button 
+        expand="block" 
+        type="submit" 
+        [disabled]="!materialForm.valid"
+        size="large">
+        <ion-icon name="save" slot="start"></ion-icon>
+        {{ isEditMode ? 'Actualizar Material' : 'Crear Material' }}
+      </ion-button>
+      
+      <ion-button 
+        expand="block" 
+        fill="outline" 
+        (click)="cancel()"
+        size="large">
+        <ion-icon name="close" slot="start"></ion-icon>
+        Cancelar
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

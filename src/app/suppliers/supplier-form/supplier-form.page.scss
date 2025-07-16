@@ -1,0 +1,134 @@
+.supplier-form-container {
+  padding: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+ion-card {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  ion-card-header {
+    padding-bottom: 8px;
+    
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.1rem;
+      color: var(--ion-color-primary);
+      
+      ion-icon {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  ion-card-content {
+    padding-top: 0;
+  }
+}
+
+ion-item {
+  --border-radius: 8px;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 16px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+ion-label {
+  font-weight: 500;
+  color: var(--ion-color-dark);
+  margin-bottom: 4px;
+  
+  &[position="stacked"] {
+    margin-bottom: 8px;
+  }
+}
+
+ion-input, ion-textarea {
+  --background: var(--ion-color-light);
+  --border-radius: 8px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  
+  &.ion-invalid.ion-touched {
+    --border-color: var(--ion-color-danger);
+    --border-width: 2px;
+  }
+}
+
+ion-textarea {
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+}
+
+ion-note[slot="error"] {
+  font-size: 0.8rem;
+  color: var(--ion-color-danger);
+  margin-top: 4px;
+}
+
+ion-toggle {
+  --handle-background-checked: var(--ion-color-primary);
+  --track-background-checked: var(--ion-color-primary-tint);
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 0 4px;
+  
+  ion-button {
+    flex: 1;
+    height: 48px;
+    font-weight: 500;
+    
+    &:first-child {
+      --border-width: 2px;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .supplier-form-container {
+    padding: 12px;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    
+    ion-button {
+      margin-bottom: 8px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  ion-card {
+    --background: var(--ion-color-step-50);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  ion-input, ion-textarea {
+    --background: var(--ion-color-step-100);
+  }
+}
+
+// Loading state
+.form-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}

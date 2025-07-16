@@ -1,0 +1,168 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Proyectos y Obras</ion-title>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="canCreateWork()" (click)="addWork()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Proyectos</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Barra de búsqueda -->
+  <ion-searchbar
+    placeholder="Buscar proyectos..."
+    (ionInput)="onSearchChange($event)"
+    debounce="500">
+  </ion-searchbar>
+
+  <!-- Segmentos de filtro -->
+  <ion-segment 
+    value="all" 
+    (ionChange)="onSegmentChange($event)"
+    scrollable="true">
+    <ion-segment-button value="all">
+      <ion-label>Todos</ion-label>
+      <ion-chip>{{ works.length }}</ion-chip>
+    </ion-segment-button>
+    <ion-segment-button value="active">
+      <ion-label>Activos</ion-label>
+      <ion-chip color="success">{{ activeWorksCount }}</ion-chip>
+    </ion-segment-button>
+    <ion-segment-button value="finished">
+      <ion-label>Terminados</ion-label>
+      <ion-chip color="primary">{{ finishedWorksCount }}</ion-chip>
+    </ion-segment-button>
+    <ion-segment-button value="suspended">
+      <ion-label>Suspendidos</ion-label>
+      <ion-chip color="warning">{{ suspendedWorksCount }}</ion-chip>
+    </ion-segment-button>
+    <ion-segment-button value="cancelled">
+      <ion-label>Cancelados</ion-label>
+      <ion-chip color="danger">{{ cancelledWorksCount }}</ion-chip>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Lista de proyectos -->
+  <ion-list>
+    <ion-item-sliding *ngFor="let work of filteredWorks">
+      <ion-item (click)="viewWork(work)" button>
+        <ion-label>
+          <h2>{{ work.name }}</h2>
+          <p>{{ work.description }}</p>
+          <p>
+            <ion-icon name="location" style="margin-right: 5px;"></ion-icon>
+            {{ work.location }}
+          </p>
+          <p *ngIf="work.clientName">
+            <ion-icon name="business" style="margin-right: 5px;"></ion-icon>
+            {{ work.clientName }}
+          </p>
+          <p>
+            <ion-icon name="calendar" style="margin-right: 5px;"></ion-icon>
+            Inicio: {{ formatDate(work.startDate) }}
+            <span *ngIf="work.estimatedEndDate"> | Fin estimado: {{ formatDate(work.estimatedEndDate) }}</span>
+          </p>
+          <div class="work-status">
+            <ion-badge [color]="getStatusColor(work.status)">
+              <ion-icon [name]="getStatusIcon(work.status)" style="margin-right: 4px;"></ion-icon>
+              {{ getStatusText(work.status) }}
+            </ion-badge>
+            <ion-badge 
+              *ngIf="work.status === 'activa' && work.estimatedEndDate"
+              [color]="isOverdue(work) ? 'danger' : getDaysRemaining(work) <= 7 ? 'warning' : 'medium'"
+              style="margin-left: 10px;">
+              {{ isOverdue(work) ? 'Vencido' : getDaysRemaining(work) + ' días restantes' }}
+            </ion-badge>
+          </div>
+        </ion-label>
+        <!-- Botón de editar fecha de entrega para técnicos -->
+        <ion-button 
+          *ngIf="canEditWorkDeliveryDate() && !canEditWorkBasicInfo()"
+          slot="end" 
+          fill="clear" 
+          size="small"
+          color="primary"
+          (click)="openDeliveryDateModal(work); $event.stopPropagation()">
+          <ion-icon name="calendar"></ion-icon>
+        </ion-button>
+        <!-- Botón de editar completo para admin/encargado -->
+        <ion-button 
+          *ngIf="canEditWorkBasicInfo()"
+          slot="end" 
+          fill="clear" 
+          size="small"
+          (click)="editWork(work); $event.stopPropagation()">
+          <ion-icon name="create"></ion-icon>
+        </ion-button>
+        <!-- Botón de cambiar estado solo para admin/encargado -->
+        <ion-button 
+          *ngIf="canEditWorkStatus()"
+          slot="end" 
+          fill="clear" 
+          size="small"
+          (click)="changeWorkStatus(work); $event.stopPropagation()">
+          <ion-icon [name]="getStatusIcon(work.status)"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <!-- Opciones deslizantes -->
+      <ion-item-options side="end">
+        <!-- Opción de fecha de entrega para técnicos -->
+        <ion-item-option 
+          *ngIf="canEditWorkDeliveryDate() && !canEditWorkBasicInfo()" 
+          (click)="openDeliveryDateModal(work)" 
+          color="primary">
+          <ion-icon name="calendar"></ion-icon>
+          Fecha Entrega
+        </ion-item-option>
+        <!-- Opción de editar completo para admin/encargado -->
+        <ion-item-option 
+          *ngIf="canEditWorkBasicInfo()" 
+          (click)="editWork(work)" 
+          color="primary">
+          <ion-icon name="create"></ion-icon>
+          Editar
+        </ion-item-option>
+        <!-- Opción de eliminar solo para admin -->
+        <ion-item-option 
+          *ngIf="canDeleteWork()" 
+          (click)="deleteWork(work)" 
+          color="danger">
+          <ion-icon name="trash"></ion-icon>
+          Eliminar
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+
+  <!-- Mensaje cuando no hay proyectos -->
+  <div *ngIf="filteredWorks.length === 0" class="empty-state">
+    <ion-icon name="business" size="large" color="medium"></ion-icon>
+    <h2>No hay proyectos</h2>
+    <p>{{ searchTerm ? 'No se encontraron proyectos con ese término' : 'No hay proyectos registrados' }}</p>
+    <ion-button *ngIf="!searchTerm" (click)="addWork()" expand="block">
+      <ion-icon name="add" slot="start"></ion-icon>
+      Agregar Proyecto
+    </ion-button>
+  </div>
+
+  <!-- Botón flotante para agregar (solo admin/encargado) -->
+  <ion-fab *ngIf="canCreateWork()" slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="addWork()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

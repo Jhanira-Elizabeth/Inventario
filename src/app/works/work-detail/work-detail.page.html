@@ -1,0 +1,173 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/works"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ work?.name || 'Proyecto' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" *ngIf="work">
+  <!-- Información principal -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ work.name }}</ion-card-title>
+      <div class="project-meta">
+        <ion-badge [color]="getStatusColor(work.status)">
+          <ion-icon [name]="getStatusIcon(work.status)" style="margin-right: 4px;"></ion-icon>
+          {{ getStatusText(work.status) }}
+        </ion-badge>
+        <ion-badge 
+          *ngIf="work.status === 'activa' && work.estimatedEndDate"
+          [color]="isOverdue() ? 'danger' : getDaysRemaining() <= 7 ? 'warning' : 'medium'"
+          style="margin-left: 10px;">
+          {{ isOverdue() ? 'Vencido' : getDaysRemaining() + ' días restantes' }}
+        </ion-badge>
+      </div>
+    </ion-card-header>
+    
+    <ion-card-content>
+      <p><strong>Descripción:</strong></p>
+      <p style="color: var(--ion-color-medium); margin-bottom: 16px;">{{ work.description }}</p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Información del cliente y ubicación -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Detalles del Proyecto</ion-card-title>
+    </ion-card-header>
+    
+    <ion-card-content>
+      <ion-list>
+        <ion-item>
+          <ion-icon name="location" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h3>Ubicación</h3>
+            <p>{{ work.location }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item *ngIf="work.clientName">
+          <ion-icon name="business" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h3>Cliente</h3>
+            <p>{{ work.clientName }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item *ngIf="work.totalMaterialsCost">
+          <ion-icon name="pricetag" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h3>Costo de Materiales</h3>
+            <p>${{ work.totalMaterialsCost.toFixed(2) }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Fechas del proyecto -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Cronograma</ion-card-title>
+    </ion-card-header>
+    
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6" size-md="3">
+            <div class="date-item">
+              <div class="date-label">Inicio</div>
+              <div class="date-value">{{ formatDateShort(work.startDate) }}</div>
+            </div>
+          </ion-col>
+          
+          <ion-col size="6" size-md="3" *ngIf="work.estimatedEndDate">
+            <div class="date-item">
+              <div class="date-label">Fin Estimado</div>
+              <div class="date-value">{{ formatDateShort(work.estimatedEndDate) }}</div>
+            </div>
+          </ion-col>
+          
+          <ion-col size="6" size-md="3" *ngIf="work.endDate">
+            <div class="date-item">
+              <div class="date-label">Fin Real</div>
+              <div class="date-value">{{ formatDateShort(work.endDate) }}</div>
+            </div>
+          </ion-col>
+          
+          <ion-col size="6" size-md="3">
+            <div class="date-item">
+              <div class="date-label">Duración</div>
+              <div class="date-value">{{ getDurationInDays() }} días</div>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Información adicional -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Información del Sistema</ion-card-title>
+    </ion-card-header>
+    
+    <ion-card-content>
+      <ion-list>
+        <ion-item>
+          <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h3>Fecha de Creación</h3>
+            <p>{{ formatDate(work.createdAt) }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item>
+          <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h3>Última Actualización</h3>
+            <p>{{ formatDate(work.updatedAt) }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Botones de acción -->
+  <div class="action-buttons">
+    <ion-button 
+      expand="block" 
+      (click)="changeWorkStatus()"
+      size="large">
+      <ion-icon [name]="getStatusIcon(work.status)" slot="start"></ion-icon>
+      Cambiar Estado
+    </ion-button>
+    
+    <ion-button 
+      expand="block" 
+      color="danger" 
+      fill="outline" 
+      (click)="deleteWork()"
+      size="large">
+      <ion-icon name="trash" slot="start"></ion-icon>
+      Eliminar Proyecto
+    </ion-button>
+  </div>
+
+  <!-- FAB para cambiar estado -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="changeWorkStatus()">
+      <ion-icon [name]="getStatusIcon(work.status)"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
+
+<!-- Loading state -->
+<ion-content *ngIf="!work" class="loading-content">
+  <div class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando proyecto...</p>
+  </div>
+</ion-content>

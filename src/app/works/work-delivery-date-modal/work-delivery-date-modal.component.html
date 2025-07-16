@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Actualizar Fecha de Entrega</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancel()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="deliveryForm" (ngSubmit)="updateDeliveryDate()">
+    
+    <!-- Información de la obra -->
+    <div class="work-info">
+      <h3>{{ work.name }}</h3>
+      <p>{{ work.description }}</p>
+      <p><strong>Cliente:</strong> {{ work.clientName || 'No especificado' }}</p>
+      <p><strong>Ubicación:</strong> {{ work.location }}</p>
+    </div>
+
+    <!-- Campo de fecha de entrega -->
+    <ion-item>
+      <ion-label position="stacked">
+        <ion-icon name="calendar"></ion-icon>
+        Fecha Real de Entrega
+      </ion-label>
+      <ion-input
+        type="date"
+        formControlName="actualDeliveryDate"
+        [class.ion-invalid]="isFieldInvalid('actualDeliveryDate')"
+        placeholder="Selecciona la fecha de entrega">
+      </ion-input>
+      <ion-note slot="error" *ngIf="isFieldInvalid('actualDeliveryDate')">
+        {{ getFieldError('actualDeliveryDate') }}
+      </ion-note>
+    </ion-item>
+
+    <!-- Botones de acción -->
+    <div class="action-buttons">
+      <ion-button expand="block" type="submit" [disabled]="!deliveryForm.valid">
+        <ion-icon name="checkmark" slot="start"></ion-icon>
+        Actualizar Fecha
+      </ion-button>
+      
+      <ion-button expand="block" fill="outline" color="medium" (click)="cancel()">
+        Cancelar
+      </ion-button>
+    </div>
+
+  </form>
+</ion-content>

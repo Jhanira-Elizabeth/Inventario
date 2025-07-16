@@ -1,0 +1,142 @@
+<ion-modal [isOpen]="isModalOpen" (ionModalDidDismiss)="closeModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ modalTitle }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeModal()">
+            <ion-icon name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content [fullscreen]="true"> <form [formGroup]="movementForm" (ngSubmit)="submitMovement()">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Detalles del Movimiento</ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <ion-grid>
+              <ion-row>
+                <ion-col size="12">
+                  <ion-item fill="outline">
+                    <ion-label position="floating">Material *</ion-label>
+                    <ion-select
+                      formControlName="materialId"
+                      placeholder="Selecciona un material"
+                      [class.ion-invalid]="isFieldInvalid('materialId')"
+                      [class.ion-touched]="movementForm.get('materialId')?.touched"
+                      interface="popover"> <ion-select-option
+                        *ngFor="let material of getActiveMaterials()" [value]="material.id">
+                        {{ material.name }} (Stock: {{ material.currentStock }})
+                      </ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                  <div *ngIf="isFieldInvalid('materialId')" class="error-message">
+                    {{ getFieldError('materialId') }}
+                  </div>
+                  <ion-note color="danger" *ngIf="getActiveMaterials().length === 0" style="display:block;text-align:center;margin-top:0.5em;">
+                      No hay materiales activos disponibles. Por favor, crea uno primero.
+                  </ion-note>
+                </ion-col>
+              </ion-row>
+
+              <ion-row>
+                <ion-col size="12">
+                  <ion-item fill="outline">
+                    <ion-label position="floating">Cantidad *</ion-label>
+                    <ion-input
+                      formControlName="quantity"
+                      type="number"
+                      min="1"
+                      placeholder="Ingresa la cantidad"
+                      [class.ion-invalid]="isFieldInvalid('quantity')"
+                      [class.ion-touched]="movementForm.get('quantity')?.touched">
+                    </ion-input>
+                  </ion-item>
+                  <div *ngIf="isFieldInvalid('quantity')" class="error-message">
+                    {{ getFieldError('quantity') }}
+                  </div>
+                </ion-col>
+              </ion-row>
+
+              <ion-row *ngIf="movementType !== 'entry'">
+                <ion-col size="12">
+                  <ion-item fill="outline">
+                    <ion-label position="floating">
+                      Obra {{ movementType === 'delivery' ? '*' : '' }}
+                    </ion-label>
+                    <ion-select
+                      formControlName="workId"
+                      placeholder="Selecciona una obra"
+                      [class.ion-invalid]="isFieldInvalid('workId')"
+                      [class.ion-touched]="movementForm.get('workId')?.touched"
+                      interface="popover">
+                      <ion-select-option
+                        *ngFor="let work of works"
+                        [value]="work.id">
+                        {{ work.name }}
+                      </ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                  <div *ngIf="isFieldInvalid('workId')" class="error-message">
+                    {{ getFieldError('workId') }}
+                  </div>
+                </ion-col>
+              </ion-row>
+
+              <ion-row *ngIf="movementType === 'delivery'">
+                <ion-col size="12">
+                  <ion-item fill="outline">
+                    <ion-label position="floating">Técnico *</ion-label>
+                    <ion-select
+                      formControlName="technicianId"
+                      placeholder="Selecciona un técnico"
+                      [class.ion-invalid]="isFieldInvalid('technicianId')"
+                      [class.ion-touched]="movementForm.get('technicianId')?.touched"
+                      interface="popover">
+                      <ion-select-option *ngFor="let technician of technicians" [value]="technician.id">
+                  {{ technician.firstName }} {{ technician.lastName }}
+                       </ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                  <div *ngIf="isFieldInvalid('technicianId')" class="error-message">
+                    {{ getFieldError('technicianId') }}
+                  </div>
+                </ion-col>
+              </ion-row>
+
+              <ion-row>
+                <ion-col size="12">
+                  <ion-item fill="outline">
+                    <ion-label position="floating">Notas</ion-label>
+                    <ion-textarea
+                      formControlName="notes"
+                      placeholder="Notas adicionales (opcional)"
+                      rows="3">
+                    </ion-textarea>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
+
+        <div class="form-actions ion-padding"> <ion-button
+            expand="block"
+            type="submit"
+            [disabled]="isRegisteringMovement || movementForm.invalid"
+            [color]="getMovementTypeColor(($any(movementType) == 'entry') ? MovementType.ENTRADA : MovementType.SALIDA_ENTREGA)">
+            <ion-icon
+              [name]="getMovementTypeIcon(($any(movementType) == 'entry') ? MovementType.ENTRADA : MovementType.SALIDA_ENTREGA)"
+              slot="start">
+            </ion-icon>
+            {{ submitButtonText }}
+          </ion-button>
+        </div>
+      </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>

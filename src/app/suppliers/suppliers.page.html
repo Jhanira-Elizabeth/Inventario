@@ -1,0 +1,150 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      <ion-icon name="business" style="margin-right: 8px;"></ion-icon>
+      Proveedores
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="addSupplier()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Header with search -->
+  <div class="header-section">
+    <ion-searchbar 
+      [(ngModel)]="searchTerm" 
+      (ionInput)="onSearchChange($event)"
+      placeholder="Buscar por nombre, email, RUC..."
+      show-clear-button="focus">
+    </ion-searchbar>
+  </div>
+
+  <!-- Stats segments -->
+  <ion-segment 
+    [(ngModel)]="selectedSegment" 
+    (ionChange)="onSegmentChange($event)" 
+    scrollable="true">
+    <ion-segment-button value="all">
+      <ion-label>
+        <div>Todos</div>
+        <div class="percentage-text">100%</div>
+      </ion-label>
+      <ion-chip>{{ totalSuppliers }}</ion-chip>
+    </ion-segment-button>
+    <ion-segment-button value="active">
+      <ion-label>
+        <div>Activos</div>
+        <div class="percentage-text">{{ activePercentage }}%</div>
+      </ion-label>
+      <ion-chip color="success">{{ activeSuppliers }}</ion-chip>
+    </ion-segment-button>
+    <ion-segment-button value="inactive">
+      <ion-label>
+        <div>Inactivos</div>
+        <div class="percentage-text">{{ inactivePercentage }}%</div>
+      </ion-label>
+      <ion-chip color="medium">{{ inactiveSuppliers }}</ion-chip>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Suppliers list -->
+  <ion-list>
+    <ion-item-sliding *ngFor="let supplier of filteredSuppliers">
+      <ion-item button>
+        <div class="supplier-info" [class.inactive]="!supplier.isActive">
+          <div class="supplier-header">
+            <h2>{{ supplier.name }}</h2>
+            <ion-badge [color]="getStatusBadgeColor(supplier)">
+              {{ getStatusText(supplier) }}
+            </ion-badge>
+          </div>
+          
+          <div class="supplier-details">
+            <p *ngIf="supplier.contactPerson">
+              <ion-icon name="person"></ion-icon>
+              {{ supplier.contactPerson }}
+            </p>
+            <p *ngIf="supplier.email">
+              <ion-icon name="mail"></ion-icon>
+              {{ supplier.email }}
+            </p>
+            <p *ngIf="supplier.phone">
+              <ion-icon name="call"></ion-icon>
+              {{ supplier.phone }}
+            </p>
+            <p *ngIf="supplier.city">
+              <ion-icon name="location"></ion-icon>
+              {{ supplier.city }}
+            </p>
+            <p *ngIf="supplier.ruc" class="ruc-info">
+              <strong>RUC:</strong> {{ supplier.ruc }}
+            </p>
+          </div>
+
+          <div class="supplier-actions">
+            <ion-button 
+              fill="clear" 
+              size="small"
+              color="primary"
+              (click)="editSupplier(supplier); $event.stopPropagation()"
+              title="Editar proveedor">
+              <ion-icon name="create"></ion-icon>
+            </ion-button>
+            <ion-button 
+              fill="clear" 
+              size="small"
+              [color]="supplier.isActive ? 'danger' : 'success'"
+              (click)="toggleSupplierStatus(supplier); $event.stopPropagation()"
+              [title]="supplier.isActive ? 'Desactivar proveedor' : 'Activar proveedor'">
+              <ion-icon [name]="supplier.isActive ? 'ban' : 'checkmark-circle'"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </ion-item>
+
+      <ion-item-options side="end">
+        <ion-item-option (click)="editSupplier(supplier)" color="primary">
+          <ion-icon name="create"></ion-icon>
+          Editar
+        </ion-item-option>
+        <ion-item-option 
+          (click)="toggleSupplierStatus(supplier)" 
+          [color]="supplier.isActive ? 'danger' : 'success'">
+          <ion-icon [name]="supplier.isActive ? 'ban' : 'checkmark-circle'"></ion-icon>
+          {{ supplier.isActive ? 'Desactivar' : 'Activar' }}
+        </ion-item-option>
+        <ion-item-option (click)="deleteSupplier(supplier)" color="danger">
+          <ion-icon name="trash"></ion-icon>
+          Eliminar
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+
+  <!-- Empty state -->
+  <div *ngIf="filteredSuppliers.length === 0" class="empty-state">
+    <ion-icon name="business" class="empty-icon"></ion-icon>
+    <h3>No hay proveedores</h3>
+    <p>{{ searchTerm ? 'No se encontraron proveedores con ese término de búsqueda' : 'Aún no has agregado ningún proveedor' }}</p>
+    <ion-button *ngIf="!searchTerm" (click)="addSupplier()" expand="block">
+      <ion-icon name="add" slot="start"></ion-icon>
+      Agregar primer proveedor
+    </ion-button>
+  </div>
+
+  <!-- Floating action button -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="addSupplier()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

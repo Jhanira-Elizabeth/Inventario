@@ -1,0 +1,179 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/works"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ pageTitle }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="onSubmit()" [disabled]="!workForm.valid">
+        <ion-icon name="save"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <form [formGroup]="workForm" (ngSubmit)="onSubmit()">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Información del Proyecto</ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12">
+              <ion-item fill="outline">
+                <ion-label position="floating">Nombre del Proyecto *</ion-label>
+                <ion-input
+                  formControlName="name"
+                  placeholder=""
+                  [class.ion-invalid]="isFieldInvalid('name')"
+                  [class.ion-touched]="workForm.get('name')?.touched">
+                </ion-input>
+              </ion-item>
+              <div *ngIf="isFieldInvalid('name')" class="error-message">
+                {{ getFieldError('name') }}
+              </div>
+            </ion-col>
+          </ion-row>
+          
+          <ion-row>
+            <ion-col size="12">
+              <ion-item fill="outline">
+                <ion-label position="floating">Descripción *</ion-label>
+                <ion-textarea
+                  formControlName="description"
+                  placeholder=""
+                  rows="3"
+                  [class.ion-invalid]="isFieldInvalid('description')"
+                  [class.ion-touched]="workForm.get('description')?.touched">
+                </ion-textarea>
+              </ion-item>
+              <div *ngIf="isFieldInvalid('description')" class="error-message">
+                {{ getFieldError('description') }}
+              </div>
+            </ion-col>
+          </ion-row>
+          
+          <ion-row>
+            <ion-col size="12" size-md="6">
+              <ion-item fill="outline">
+                <ion-label position="floating">Ubicación *</ion-label>
+                <ion-input
+                  formControlName="location"
+                  placeholder=""
+                  [class.ion-invalid]="isFieldInvalid('location')"
+                  [class.ion-touched]="workForm.get('location')?.touched">
+                </ion-input>
+              </ion-item>
+              <div *ngIf="isFieldInvalid('location')" class="error-message">
+                {{ getFieldError('location') }}
+              </div>
+            </ion-col>
+            
+            <ion-col size="12" size-md="6">
+              <ion-item fill="outline">
+                <ion-label position="floating">Cliente</ion-label>
+                <ion-input
+                  formControlName="clientName"
+                  placeholder="">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Estado y Fechas</ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-md="6">
+              <ion-item fill="outline">
+                <ion-label position="floating">Estado *</ion-label>
+                <ion-select
+                  formControlName="status"
+                  placeholder="Seleccionar estado"
+                  [class.ion-invalid]="isFieldInvalid('status')"
+                  [class.ion-touched]="workForm.get('status')?.touched">
+                  <ion-select-option *ngFor="let option of statusOptions" [value]="option.value">
+                    {{ option.label }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <div *ngIf="isFieldInvalid('status')" class="error-message">
+                {{ getFieldError('status') }}
+              </div>
+            </ion-col>
+            
+            <ion-col size="12" size-md="6">
+              <ion-item fill="outline">
+                <ion-label position="floating">Costo Total de Materiales</ion-label>
+                <ion-input
+                  type="number"
+                  formControlName="totalMaterialsCost"
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          
+          <ion-row>
+            <ion-col size="12" size-md="6">
+              <ion-item fill="outline">
+                <ion-label position="floating">Fecha de Inicio *</ion-label>
+                <ion-datetime
+                  formControlName="startDate"
+                  presentation="date"
+                  [class.ion-invalid]="isFieldInvalid('startDate')"
+                  [class.ion-touched]="workForm.get('startDate')?.touched">
+                </ion-datetime>
+              </ion-item>
+              <div *ngIf="isFieldInvalid('startDate')" class="error-message">
+                {{ getFieldError('startDate') }}
+              </div>
+            </ion-col>
+            
+            <ion-col size="12" size-md="6">
+              <ion-item fill="outline">
+                <ion-label position="floating">Fecha Estimada de Fin</ion-label>
+                <ion-datetime
+                  formControlName="estimatedEndDate"
+                  presentation="date">
+                </ion-datetime>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+
+    <div class="form-actions">
+      <ion-button 
+        expand="block" 
+        type="submit" 
+        [disabled]="!workForm.valid"
+        size="large">
+        <ion-icon name="save" slot="start"></ion-icon>
+        {{ isEditMode ? 'Actualizar Proyecto' : 'Crear Proyecto' }}
+      </ion-button>
+      
+      <ion-button 
+        expand="block" 
+        fill="outline" 
+        (click)="cancel()"
+        size="large">
+        <ion-icon name="close" slot="start"></ion-icon>
+        Cancelar
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

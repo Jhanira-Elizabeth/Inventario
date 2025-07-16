@@ -1,0 +1,174 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/suppliers"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ pageTitle }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="supplier-form-container">
+    <form [formGroup]="supplierForm" (ngSubmit)="onSubmit()">
+      
+      <!-- Información básica -->
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon name="business"></ion-icon>
+            Información Básica
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="stacked">
+              Nombre del Proveedor *
+            </ion-label>
+            <ion-input 
+              formControlName="name" 
+              placeholder="Ingresa el nombre del proveedor"
+              [class.ion-invalid]="isFieldInvalid('name')"
+              [class.ion-touched]="supplierForm.get('name')?.touched">
+            </ion-input>
+            <ion-note slot="error" *ngIf="isFieldInvalid('name')">
+              {{ getFieldError('name') }}
+            </ion-note>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">
+              RUC
+            </ion-label>
+            <ion-input 
+              formControlName="ruc" 
+              placeholder="1234567890001"
+              maxlength="13">
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">
+              Persona de Contacto
+            </ion-label>
+            <ion-input 
+              formControlName="contactPerson" 
+              placeholder="Nombre del contacto principal">
+            </ion-input>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Información de contacto -->
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon name="call"></ion-icon>
+            Información de Contacto
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="stacked">
+              Email
+            </ion-label>
+            <ion-input 
+              formControlName="email" 
+              type="email"
+              placeholder="correo@ejemplo.com"
+              [class.ion-invalid]="isFieldInvalid('email')"
+              [class.ion-touched]="supplierForm.get('email')?.touched">
+            </ion-input>
+            <ion-note slot="error" *ngIf="isFieldInvalid('email')">
+              {{ getFieldError('email') }}
+            </ion-note>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">
+              Teléfono
+            </ion-label>
+            <ion-input 
+              formControlName="phone" 
+              type="tel"
+              placeholder="03-2741562">
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">
+              Dirección
+            </ion-label>
+            <ion-input 
+              formControlName="address" 
+              placeholder="Dirección completa">
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">
+              Ciudad
+            </ion-label>
+            <ion-input 
+              formControlName="city" 
+              placeholder="Ambato">
+            </ion-input>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Información adicional -->
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon name="document"></ion-icon>
+            Información Adicional
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="stacked">
+              Notas
+            </ion-label>
+            <ion-textarea 
+              formControlName="notes" 
+              placeholder="Notas adicionales sobre el proveedor"
+              rows="3">
+            </ion-textarea>
+          </ion-item>
+
+          <ion-item *ngIf="isEditMode">
+            <ion-label>
+              Proveedor Activo
+            </ion-label>
+            <ion-toggle 
+              formControlName="isActive"
+              slot="end">
+            </ion-toggle>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Botones de acción -->
+      <div class="form-actions">
+        <ion-button 
+          expand="block" 
+          fill="outline" 
+          color="medium"
+          (click)="onCancel()">
+          <ion-icon name="close" slot="start"></ion-icon>
+          Cancelar
+        </ion-button>
+
+        <ion-button 
+          expand="block" 
+          type="submit"
+          [disabled]="supplierForm.invalid || isLoading"
+          color="primary">
+          <ion-icon name="save" slot="start"></ion-icon>
+          {{ submitButtonText }}
+        </ion-button>
+      </div>
+
+    </form>
+  </div>
+</ion-content>

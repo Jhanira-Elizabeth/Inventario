@@ -1,0 +1,145 @@
+// Tarjetas de estadísticas
+.stats-card {
+  margin: 8px 0;
+  
+  ion-card-content {
+    padding: 16px;
+  }
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  ion-icon {
+    font-size: 24px;
+  }
+}
+
+.stat-info {
+  flex: 1;
+  
+  .stat-number {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--ion-color-dark);
+    margin-bottom: 4px;
+  }
+  
+  .stat-label {
+    font-size: 12px;
+    color: var(--ion-color-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+// Contenedores de gráficos
+.chart-container {
+  height: 300px;
+  position: relative;
+  margin: 16px 0;
+  
+  canvas {
+    max-height: 100%;
+    max-width: 100%;
+  }
+}
+
+.chart-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 16px;
+  
+  ion-chip {
+    margin: 2px;
+  }
+}
+
+// Métricas adicionales
+.metrics-list {
+  margin: 16px 0;
+}
+
+.metric-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--ion-color-light);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  .metric-label {
+    font-weight: 500;
+    color: var(--ion-color-dark);
+  }
+  
+  .metric-value {
+    font-weight: bold;
+  }
+}
+
+// Tarjetas responsivas
+ion-card {
+  margin: 8px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  ion-card-header {
+    padding-bottom: 8px;
+    
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+}
+
+// Segmento de período
+ion-segment {
+  --background: var(--ion-color-light);
+  border-radius: 8px;
+  
+  ion-segment-button {
+    --indicator-color: var(--ion-color-primary);
+    --color-checked: var(--ion-color-primary-contrast);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .chart-container {
+    height: 250px;
+  }
+  
+  .stat-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+    
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+  
+  .chart-summary {
+    flex-direction: column;
+    align-items: center;
+    
+    ion-chip {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}

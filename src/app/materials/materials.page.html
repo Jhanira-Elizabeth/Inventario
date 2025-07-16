@@ -1,0 +1,252 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Inventario de Materiales</ion-title>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="canCreateMaterial()" (click)="addMaterial()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Inventario</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Barra de búsqueda -->
+  <ion-searchbar
+    placeholder="Buscar materiales..."
+    (ionInput)="onSearchChange($event)"
+    debounce="500">
+  </ion-searchbar>
+
+  <!-- Segmentos de filtro -->
+  <ion-segment 
+    value="all" 
+    (ionChange)="onSegmentChange($event)"
+    scrollable="true">
+    <ion-segment-button value="all">
+      <ion-label>Todos</ion-label>
+      <ion-chip>{{ materials.length }}</ion-chip>
+    </ion-segment-button>
+    <ion-segment-button value="low-stock">
+      <ion-label>Stock Bajo</ion-label>
+      <ion-chip color="warning">{{ lowStockCount }}</ion-chip>
+    </ion-segment-button>
+    <ion-segment-button value="active">
+      <ion-label>Activos</ion-label>
+      <ion-chip color="success">{{ activeMaterialsCount }}</ion-chip>
+    </ion-segment-button>
+    <ion-segment-button value="inactive">
+      <ion-label>Inactivos</ion-label>
+      <ion-chip color="medium">{{ inactiveMaterialsCount }}</ion-chip>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Lista de materiales -->
+  <ion-list>
+    <ion-item-sliding *ngFor="let material of filteredMaterials">
+      <ion-item (click)="viewMaterial(material)" button [class.inactive-material]="!material.isActive">
+        <ion-label>
+          <h2>
+            {{ material.name }}
+            <ion-badge 
+              [color]="material.isActive ? 'success' : 'medium'"
+              style="margin-left: 8px;">
+              {{ material.isActive ? 'Activo' : 'Inactivo' }}
+            </ion-badge>
+          </h2>
+          <p>{{ material.code }} - {{ material.description }}</p>
+          <p>
+            <strong>Stock: {{ material.currentStock }} {{ material.unit }}</strong>
+            <ion-badge 
+              [color]="getStockBadgeColor(material)"
+              style="margin-left: 10px;">
+              {{ getStockStatus(material) === 'danger' ? 'Sin stock' : 
+                 getStockStatus(material) === 'warning' ? 'Stock bajo' : 'Stock normal' }}
+            </ion-badge>
+          </p>
+          <p>
+            <ion-chip color="primary" outline>{{ material.category }}</ion-chip>
+            <ion-chip color="medium" outline>{{ material.location }}</ion-chip>
+            <ion-chip 
+              [color]="material.price ? 'tertiary' : 'light'" 
+              outline
+              *ngIf="material.price">
+              ${{ material.price | number:'1.2-2' }}
+            </ion-chip>
+          </p>
+        </ion-label>
+        <ion-button 
+          *ngIf="canEditMaterial()"
+          slot="end" 
+          fill="clear" 
+          [disabled]="!material.isActive"
+          (click)="adjustStock(material); $event.stopPropagation()">
+          <ion-icon name="cube"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <!-- Opciones deslizantes -->
+      <ion-item-options *ngIf="canEditMaterial()" side="end">
+        <ion-item-option (click)="openStockAdjustmentModal(material)" color="primary" [disabled]="!material.isActive">
+          <ion-icon name="swap-vertical"></ion-icon>
+          Ajustar Stock
+        </ion-item-option>
+        <ion-item-option (click)="editMaterial(material)" color="secondary">
+          <ion-icon name="create"></ion-icon>
+          Editar
+        </ion-item-option>
+        <ion-item-option 
+          (click)="toggleMaterialStatus(material)" 
+          [color]="material.isActive ? 'warning' : 'success'">
+          <ion-icon [name]="material.isActive ? 'close-circle' : 'checkmark-circle'"></ion-icon>
+          {{ material.isActive ? 'Desactivar' : 'Activar' }}
+        </ion-item-option>
+        <ion-item-option (click)="deleteMaterial(material)" color="danger">
+          <ion-icon name="trash"></ion-icon>
+          Eliminar
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+
+  <!-- Mensaje cuando no hay materiales -->
+  <div *ngIf="filteredMaterials.length === 0" class="empty-state">
+    <ion-icon name="cube" size="large" color="medium"></ion-icon>
+    <h2>No hay materiales</h2>
+    <p>{{ searchTerm ? 'No se encontraron materiales con ese término' : 'No hay materiales registrados' }}</p>
+    <ion-button *ngIf="!searchTerm && canCreateMaterial()" (click)="addMaterial()" expand="block">
+      <ion-icon name="add" slot="start"></ion-icon>
+      Agregar Material
+    </ion-button>
+  </div>
+
+  <!-- Botón flotante para agregar -->
+  <ion-fab *ngIf="canCreateMaterial()" slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="addMaterial()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>
+
+<!-- Modal para ajustar stock -->
+<ion-modal [isOpen]="isStockModalOpen" (ionModalDidDismiss)="closeStockModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ modalTitle }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeStockModal()">
+            <ion-icon name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+      <div class="stock-modal-container">
+        
+        <!-- Información del material -->
+        <div class="material-info" *ngIf="selectedMaterial">
+          <ion-item>
+            <ion-icon name="cube" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <h2>{{ selectedMaterial.name }}</h2>
+              <p>{{ selectedMaterial.code }}</p>
+              <p><strong>Stock actual: {{ selectedMaterial.currentStock }} {{ selectedMaterial.unit }}</strong></p>
+            </ion-label>
+          </ion-item>
+        </div>
+
+        <!-- Tipo de ajuste -->
+        <div class="adjustment-type">
+          <ion-segment [(ngModel)]="adjustmentType" (ionChange)="setAdjustmentType(adjustmentType)">
+            <ion-segment-button value="ingreso">
+              <ion-icon name="trending-up"></ion-icon>
+              <ion-label>Ingreso</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="salida">
+              <ion-icon name="trending-down"></ion-icon>
+              <ion-label>Salida</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </div>
+
+        <!-- Formulario -->
+        <form [formGroup]="stockAdjustmentForm" (ngSubmit)="submitStockAdjustment()">
+          
+          <ion-item>
+            <ion-label position="stacked">
+              Cantidad {{ adjustmentType === 'ingreso' ? 'a ingresar' : 'a sacar' }} *
+            </ion-label>
+            <ion-input 
+              formControlName="quantity" 
+              type="number"
+              min="1"
+              placeholder="Ingresa la cantidad"
+              [class.ion-invalid]="isFieldInvalid('quantity')"
+              [class.ion-touched]="stockAdjustmentForm.get('quantity')?.touched">
+            </ion-input>
+            <ion-note slot="error" *ngIf="isFieldInvalid('quantity')">
+              {{ getFieldError('quantity') }}
+            </ion-note>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Notas (opcional)</ion-label>
+            <ion-textarea 
+              formControlName="notes" 
+              placeholder="Razón del ajuste de stock"
+              rows="3">
+            </ion-textarea>
+          </ion-item>
+
+          <!-- Vista previa del resultado -->
+          <div class="stock-preview" *ngIf="selectedMaterial && stockAdjustmentForm.get('quantity')?.value">
+            <ion-item>
+              <ion-icon [name]="adjustmentIcon" [color]="adjustmentColor" slot="start"></ion-icon>
+              <ion-label>
+                <h3>Nuevo stock estimado</h3>
+                <p>
+                  {{ selectedMaterial.currentStock }} 
+                  {{ adjustmentType === 'ingreso' ? '+' : '-' }} 
+                  {{ stockAdjustmentForm.get('quantity')?.value || 0 }} = 
+                  <strong>
+                    {{ adjustmentType === 'ingreso' 
+                        ? selectedMaterial.currentStock + (stockAdjustmentForm.get('quantity')?.value || 0)
+                        : selectedMaterial.currentStock - (stockAdjustmentForm.get('quantity')?.value || 0) 
+                    }} {{ selectedMaterial.unit }}
+                  </strong>
+                </p>
+              </ion-label>
+            </ion-item>
+          </div>
+
+          <!-- Botón de envío -->
+          <div class="form-actions">
+            <ion-button 
+              expand="block" 
+              type="submit"
+              [disabled]="stockAdjustmentForm.invalid"
+              [color]="adjustmentColor">
+              <ion-icon [name]="adjustmentIcon" slot="start"></ion-icon>
+              {{ submitButtonText }}
+            </ion-button>
+          </div>
+
+        </form>
+
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

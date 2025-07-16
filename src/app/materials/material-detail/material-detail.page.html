@@ -1,0 +1,217 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/materials"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ material?.name || 'Material' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="editMaterial()">
+        <ion-icon name="create"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" *ngIf="material">
+  <!-- Información principal -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ material.name }}</ion-card-title>
+      <p style="margin: 0; color: var(--ion-color-medium);">{{ material.code }}</p>
+    </ion-card-header>
+    
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12">
+            <ion-badge 
+              [color]="getStockBadgeColor()"
+              style="font-size: 14px; padding: 8px 12px;">
+              {{ getStockStatusText() }}
+            </ion-badge>
+            <ion-chip color="primary" outline style="margin-left: 10px;">
+              {{ material.category }}
+            </ion-chip>
+            <ion-chip 
+              [color]="material.isActive ? 'success' : 'danger'" 
+              outline style="margin-left: 10px;">
+              <ion-icon [name]="material.isActive ? 'checkmark' : 'close'"></ion-icon>
+              {{ material.isActive ? 'Activo' : 'Inactivo' }}
+            </ion-chip>
+          </ion-col>
+        </ion-row>
+        
+        <ion-row style="margin-top: 16px;">
+          <ion-col size="12">
+            <p><strong>Descripción:</strong></p>
+            <p style="color: var(--ion-color-medium);">{{ material.description }}</p>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Stock e inventario -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Stock e Inventario</ion-card-title>
+    </ion-card-header>
+    
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6" size-md="3">
+            <div class="stat-item">
+              <div class="stat-value">{{ material.currentStock }}</div>
+              <div class="stat-label">Stock Actual</div>
+              <div class="stat-unit">{{ material.unit }}</div>
+            </div>
+          </ion-col>
+          
+          <ion-col size="6" size-md="3">
+            <div class="stat-item">
+              <div class="stat-value">{{ material.minimumStock }}</div>
+              <div class="stat-label">Stock Mínimo</div>
+              <div class="stat-unit">{{ material.unit }}</div>
+            </div>
+          </ion-col>
+          
+          <ion-col size="6" size-md="3">
+            <div class="stat-item" *ngIf="material.price">
+              <div class="stat-value">${{ material.price }}</div>
+              <div class="stat-label">Precio</div>
+              <div class="stat-unit">por {{ material.unit }}</div>
+            </div>
+          </ion-col>
+          
+          <ion-col size="6" size-md="3">
+            <div class="stat-item" *ngIf="material.price">
+              <div class="stat-value">${{ (material.currentStock * material.price).toFixed(2) }}</div>
+              <div class="stat-label">Valor Total</div>
+              <div class="stat-unit">estimado</div>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Información adicional -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Información Adicional</ion-card-title>
+    </ion-card-header>
+    
+    <ion-card-content>
+      <ion-list>
+        <ion-item>
+          <ion-icon name="location" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h3>Ubicación</h3>
+            <p>{{ material.location }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item *ngIf="material.supplier">
+          <ion-icon name="business" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h3>Proveedor</h3>
+            <p>{{ material.supplier }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item>
+          <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h3>Fecha de Creación</h3>
+            <p>{{ formatDate(material.createdAt) }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item>
+          <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h3>Última Actualización</h3>
+            <p>{{ formatDate(material.updatedAt) }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Últimos movimientos -->
+  <ion-card *ngIf="movements.length > 0">
+    <ion-card-header>
+      <ion-card-title>Últimos Movimientos</ion-card-title>
+    </ion-card-header>
+    
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let movement of movements">
+          <ion-label>
+            <h3>
+              <ion-badge [color]="getMovementTypeColor(movement.movementType)">
+                {{ getMovementTypeText(movement.movementType) }}
+              </ion-badge>
+            </h3>
+            <p>
+              <strong>Cantidad:</strong> {{ movement.quantity > 0 ? '+' : '' }}{{ movement.quantity }} {{ material.unit }}
+            </p>
+            <p>
+              <strong>Stock resultante:</strong> {{ movement.remainingStock }} {{ material.unit }}
+            </p>
+            <p *ngIf="movement.notes">
+              <strong>Notas:</strong> {{ movement.notes }}
+            </p>
+            <p class="movement-date">{{ formatDate(movement.createdAt) }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Botones de acción -->
+  <div class="action-buttons">
+    <ion-button 
+      expand="block" 
+      (click)="adjustStock()"
+      size="large">
+      <ion-icon name="cube" slot="start"></ion-icon>
+      Ajustar Stock
+    </ion-button>
+    
+    <ion-button 
+      expand="block" 
+      fill="outline" 
+      (click)="editMaterial()"
+      size="large">
+      <ion-icon name="create" slot="start"></ion-icon>
+      Editar Material
+    </ion-button>
+    
+    <ion-button 
+      expand="block" 
+      color="danger" 
+      fill="outline" 
+      (click)="deleteMaterial()"
+      size="large">
+      <ion-icon name="trash" slot="start"></ion-icon>
+      Eliminar Material
+    </ion-button>
+  </div>
+
+  <!-- FAB para ajustar stock -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="adjustStock()">
+      <ion-icon name="cube"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
+
+<!-- Loading state -->
+<ion-content *ngIf="!material" class="loading-content">
+  <div class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando material...</p>
+  </div>
+</ion-content>

@@ -1,0 +1,7 @@
+{
+  "name": "netstar-inventory",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

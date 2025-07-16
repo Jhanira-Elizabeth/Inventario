@@ -1,0 +1,188 @@
+ion-content {
+  --background: #f5f5f5;
+}
+
+ion-searchbar {
+  --background: white;
+  margin: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+ion-segment {
+  padding: 0 16px;
+  margin-bottom: 10px;
+}
+
+ion-segment-button {
+  --background: white;
+  --background-checked: var(--ion-color-primary);
+  --color-checked: white;
+  --border-width: 1px;
+  --border-color: var(--ion-color-light);
+  margin: 2px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+ion-chip {
+  font-size: 10px;
+  height: 18px;
+  margin-left: 5px;
+}
+
+ion-list {
+  background: transparent;
+  padding: 0 10px;
+}
+
+ion-item {
+  --background: white;
+  --border-color: transparent;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+ion-item h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+  margin: 4px 0;
+}
+
+ion-item p {
+  font-size: 13px;
+  color: var(--ion-color-medium);
+  margin: 2px 0;
+}
+
+ion-badge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  &[color="success"] {
+    --background: var(--ion-color-success);
+    --color: white;
+  }
+  
+  &[color="medium"] {
+    --background: var(--ion-color-medium);
+    --color: white;
+  }
+  
+  &[color="warning"] {
+    --background: var(--ion-color-warning);
+    --color: white;
+  }
+  
+  &[color="danger"] {
+    --background: var(--ion-color-danger);
+    --color: white;
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  min-height: 300px;
+}
+
+.empty-state ion-icon {
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-state h2 {
+  color: var(--ion-color-medium);
+  margin: 10px 0;
+}
+
+.empty-state p {
+  color: var(--ion-color-light);
+  margin-bottom: 20px;
+}
+
+ion-fab-button {
+  --background: var(--ion-color-primary);
+  --color: white;
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+ion-item-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  min-width: 70px;
+}
+
+ion-item-option ion-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+/* Indicadores de stock */
+.stock-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.stock-good {
+  color: var(--ion-color-success);
+}
+
+.stock-warning {
+  color: var(--ion-color-warning);
+}
+
+.stock-danger {
+  color: var(--ion-color-danger);
+}
+
+/* Estilos para materiales inactivos */
+.inactive-material {
+  opacity: 0.6;
+  
+  ion-label {
+    h2 {
+      color: var(--ion-color-medium) !important;
+    }
+    
+    p {
+      color: var(--ion-color-medium) !important;
+    }
+  }
+  
+  ion-chip {
+    opacity: 0.7;
+  }
+  
+  ion-button {
+    opacity: 0.5;
+  }
+}
+
+/* Mejoras para chips de información */
+ion-chip {
+  &[color="tertiary"] {
+    --background: var(--ion-color-tertiary);
+    --color: white;
+    font-weight: 600;
+  }
+}
+
+// ========================================
+// NOTA: Los estilos de alerts se han movido a global.scss
+// para asegurar que se apliquen correctamente
+// ========================================

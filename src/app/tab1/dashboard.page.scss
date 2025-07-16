@@ -1,0 +1,138 @@
+.dashboard-content {
+  padding: 10px;
+}
+
+.welcome-card {
+  margin-bottom: 20px;
+  
+  .welcome-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    h2 {
+      margin: 0 0 5px 0;
+      color: var(--ion-color-primary);
+      font-weight: 600;
+    }
+    
+    p {
+      margin: 0;
+      color: var(--ion-color-medium);
+    }
+  }
+}
+
+.stat-card {
+  margin: 5px 0;
+  
+  .stat-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    
+    ion-icon {
+      font-size: 2rem;
+    }
+    
+    h3 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--ion-color-dark);
+    }
+    
+    p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--ion-color-medium);
+    }
+  }
+}
+
+.alert-card {
+  border-left: 4px solid var(--ion-color-warning);
+  
+  ion-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ion-color-warning);
+  }
+}
+
+ion-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  ion-card-header {
+    padding-bottom: 10px;
+    
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+  }
+  
+  ion-card-content {
+    padding-top: 10px;
+  }
+}
+
+ion-list {
+  padding: 0;
+  
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    margin-bottom: 8px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    ion-label {
+      h3 {
+        font-weight: 600;
+        color: var(--ion-color-dark);
+        margin-bottom: 4px;
+      }
+      
+      p {
+        font-size: 0.85rem;
+        color: var(--ion-color-medium);
+        margin: 2px 0;
+      }
+    }
+  }
+}
+
+ion-badge {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .dashboard-content {
+    padding: 5px;
+  }
+  
+  .welcome-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .stat-content {
+    gap: 10px;
+    
+    ion-icon {
+      font-size: 1.5rem;
+    }
+  }
+}

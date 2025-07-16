@@ -1,0 +1,99 @@
+.header-section {
+  padding: 16px;
+  background: var(--ion-color-light);
+}
+
+.supplier-info {
+  width: 100%;
+  padding: 8px 0;
+}
+
+.supplier-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+  }
+}
+
+.supplier-details {
+  p {
+    margin: 4px 0;
+    font-size: 0.9rem;
+    color: var(--ion-color-medium-shade);
+    display: flex;
+    align-items: center;
+    
+    ion-icon {
+      margin-right: 8px;
+      font-size: 1rem;
+      color: var(--ion-color-primary);
+    }
+  }
+
+  .ruc-info {
+    color: var(--ion-color-dark);
+    font-weight: 500;
+  }
+}
+
+.supplier-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 32px;
+  color: var(--ion-color-medium);
+
+  .empty-icon {
+    font-size: 4rem;
+    color: var(--ion-color-light-shade);
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 16px 0 8px 0;
+    color: var(--ion-color-medium-shade);
+  }
+
+  p {
+    margin-bottom: 24px;
+    line-height: 1.4;
+  }
+}
+
+ion-segment {
+  margin: 8px 16px;
+}
+
+ion-searchbar {
+  --background: var(--ion-color-light-tint);
+  --color: var(--ion-color-dark);
+}
+
+ion-item {
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+ion-badge {
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  font-size: 0.75rem;
+}
+
+ion-chip {
+  font-size: 0.8rem;
+  height: 24px;
+}

@@ -1,0 +1,150 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      <ion-icon name="home" style="margin-right: 8px;"></ion-icon>
+      Dashboard
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="onRefreshData()" [title]="'Actualizar datos'">
+        <ion-icon name="refresh"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" (click)="navigateToReports()" [title]="'Ver reportes'">
+        <ion-icon name="barChart"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Dashboard</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content 
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Desliza para actualizar"
+      refreshingSpinner="crescent"
+      refreshingText="Actualizando...">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <div class="dashboard-content">
+    <!-- Bienvenida del usuario -->
+    <ion-card class="welcome-card">
+      <ion-card-content>
+        <div class="welcome-content">
+          <div>
+            <h2>¡Bienvenido, {{ currentUser?.firstName }}!</h2>
+            <p>Resumen del sistema de inventario</p>
+          </div>
+          <ion-badge [color]="getRoleColor()">
+            {{ currentUser?.role | titlecase }}
+          </ion-badge>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Estadísticas rápidas -->
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <div class="stat-content">
+                <ion-icon name="cube" color="primary"></ion-icon>
+                <div>
+                  <h3>{{ totalMaterials }}</h3>
+                  <p>Materiales</p>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        
+        <ion-col size="6">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <div class="stat-content">
+                <ion-icon name="construct" color="warning"></ion-icon>
+                <div>
+                  <h3>{{ activeWorks.length }}</h3>
+                  <p>Obras Activas</p>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- Alertas de bajo stock -->
+    <ion-card *ngIf="lowStockMaterials.length > 0" class="alert-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="warning" color="warning"></ion-icon>
+          Alertas de Bajo Stock
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let material of lowStockMaterials">
+            <ion-label>
+              <h3>{{ material.name }}</h3>
+              <p>Stock actual: {{ material.currentStock }} {{ material.unit }}</p>
+              <p>Mínimo: {{ material.minimumStock }} {{ material.unit }}</p>
+            </ion-label>
+            <ion-badge color="warning" slot="end">Bajo Stock</ion-badge>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Obras activas -->
+    <ion-card *ngIf="activeWorks.length > 0">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="construct" color="success"></ion-icon>
+          Obras Activas
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let work of activeWorks.slice(0, 3)">
+            <ion-label>
+              <h3>{{ work.name }}</h3>
+              <p>{{ work.location }}</p>
+              <p>Cliente: {{ work.clientName }}</p>
+            </ion-label>
+            <ion-badge color="success" slot="end">Activa</ion-badge>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Movimientos recientes -->
+    <ion-card *ngIf="recentMovements.length > 0">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="refresh" color="primary"></ion-icon>
+          Movimientos Recientes
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let movement of recentMovements">
+            <ion-label>
+              <h3>{{ movement.material?.name || 'Material' }}</h3>
+              <p>Cantidad: {{ movement.quantity }}</p>
+              <p>{{ movement.createdAt | date:'short' }}</p>
+            </ion-label>
+            <ion-badge [color]="getMovementTypeColor(movement.movementType)" slot="end">
+              {{ getMovementTypeLabel(movement.movementType) }}
+            </ion-badge>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

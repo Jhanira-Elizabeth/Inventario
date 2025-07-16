@@ -1,0 +1,231 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      <ion-icon name="analytics" style="margin-right: 8px;"></ion-icon>
+      Reportes y Estadísticas
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="refreshReports()" [title]="'Actualizar reportes'">
+        <ion-icon name="refresh"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Desliza para actualizar reportes"
+      refreshingSpinner="crescent"
+      refreshingText="Actualizando reportes...">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Reportes</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Segmento de período -->
+  <ion-segment 
+    value="all" 
+    (ionChange)="onPeriodChange($event)"
+    style="margin: 16px;">        <ion-segment-button value="all">
+          <ion-label>Todo</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="month">
+          <ion-label>Este Mes</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="quarter">
+          <ion-label>Trimestre</ion-label>
+        </ion-segment-button>
+  </ion-segment>
+
+  <!-- Tarjetas de estadísticas generales -->
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6" size-md="3">
+        <ion-card class="stats-card">
+          <ion-card-content>
+            <div class="stat-item">
+              <ion-icon name="business" color="primary"></ion-icon>
+              <div class="stat-info">
+                <div class="stat-number">{{ projectStats.total }}</div>
+                <div class="stat-label">Proyectos</div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      
+      <ion-col size="6" size-md="3">
+        <ion-card class="stats-card">
+          <ion-card-content>
+            <div class="stat-item">
+              <ion-icon name="cube" color="success"></ion-icon>
+              <div class="stat-info">
+                <div class="stat-number">{{ materialStats.totalMaterials }}</div>
+                <div class="stat-label">Materiales</div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      
+      <ion-col size="6" size-md="3">
+        <ion-card class="stats-card">
+          <ion-card-content>
+            <div class="stat-item">
+              <ion-icon name="trending-up" color="warning"></ion-icon>
+              <div class="stat-info">
+                <div class="stat-number">{{ materialStats.lowStock }}</div>
+                <div class="stat-label">Stock Bajo</div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      
+      <ion-col size="6" size-md="3">
+        <ion-card class="stats-card">
+          <ion-card-content>
+            <div class="stat-item">
+              <ion-icon name="analytics" color="medium"></ion-icon>
+              <div class="stat-info">
+                <div class="stat-number">${{ materialStats.totalValue | number:'1.0-0' }}</div>
+                <div class="stat-label">Valor Total</div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Gráficos de pastel -->
+  <ion-grid>
+    <ion-row>
+      <!-- Estado de Proyectos -->
+      <ion-col size="12" size-md="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>
+              <ion-icon name="pie-chart" color="primary"></ion-icon>
+              Estado de Proyectos
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="chart-container">
+              <canvas #projectStatusChart></canvas>
+            </div>
+            <div class="chart-summary">
+              <ion-chip color="success">
+                <ion-label>Activos: {{ projectStats.active }}</ion-label>
+              </ion-chip>
+              <ion-chip color="primary">
+                <ion-label>Terminados: {{ projectStats.finished }}</ion-label>
+              </ion-chip>
+              <ion-chip color="warning">
+                <ion-label>Suspendidos: {{ projectStats.suspended }}</ion-label>
+              </ion-chip>
+              <ion-chip color="danger">
+                <ion-label>Cancelados: {{ projectStats.cancelled }}</ion-label>
+              </ion-chip>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Consumo de Materiales -->
+      <ion-col size="12" size-md="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>
+              <ion-icon name="pie-chart" color="secondary"></ion-icon>
+              Top 5 Materiales Más Consumidos
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="chart-container">
+              <canvas #materialConsumptionChart></canvas>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <!-- Proyectos que más consumen -->
+      <ion-col size="12" size-md="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>
+              <ion-icon name="pie-chart" color="tertiary"></ion-icon>
+              Top 5 Proyectos Que Más Consumen
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="chart-container">
+              <canvas #projectMaterialChart></canvas>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Métricas adicionales -->
+      <ion-col size="12" size-md="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>
+              <ion-icon name="stats-chart" color="dark"></ion-icon>
+              Métricas Clave
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="metrics-list">
+              <div class="metric-item">
+                <div class="metric-label">Proyectos Activos</div>
+                <div class="metric-value">
+                  <ion-badge color="success">{{ projectStats.active }}</ion-badge>
+                </div>
+              </div>
+              
+              <div class="metric-item">
+                <div class="metric-label">Materiales en Stock Bajo</div>
+                <div class="metric-value">
+                  <ion-badge color="warning">{{ materialStats.lowStock }}</ion-badge>
+                </div>
+              </div>
+              
+              <div class="metric-item">
+                <div class="metric-label">Materiales Agotados</div>
+                <div class="metric-value">
+                  <ion-badge color="danger">{{ materialStats.outOfStock }}</ion-badge>
+                </div>
+              </div>
+              
+              <div class="metric-item">
+                <div class="metric-label">Valor Total Inventario</div>
+                <div class="metric-value">
+                  <ion-badge color="primary">${{ materialStats.totalValue | number:'1.0-0' }}</ion-badge>
+                </div>
+              </div>
+            </div>
+            
+            <ion-button 
+              expand="block" 
+              color="primary" 
+              (click)="generateReport()"
+              style="margin-top: 20px;">
+              <ion-icon name="download" slot="start"></ion-icon>
+              Generar Reporte PDF
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
