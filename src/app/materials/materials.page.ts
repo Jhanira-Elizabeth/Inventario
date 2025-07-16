@@ -80,6 +80,7 @@ import { ConfirmationModalComponent } from '../shared/components/confirmation-mo
   ]
 })
 export class MaterialsPage implements OnInit {
+  isSubmittingStockAdjustment = false;
   materials: Material[] = [];
   filteredMaterials: Material[] = [];
   searchTerm: string = '';
@@ -454,7 +455,8 @@ private async performStatusToggle(material: Material, action: string) {
   }
 
   async submitStockAdjustment() {
-    if (this.stockAdjustmentForm.valid && this.selectedMaterial) {
+    if (this.stockAdjustmentForm.valid && this.selectedMaterial && !this.isSubmittingStockAdjustment) {
+      this.isSubmittingStockAdjustment = true;
       const formValue = this.stockAdjustmentForm.value;
       const quantity = parseInt(formValue.quantity);
       const notes = formValue.notes || '';
@@ -467,6 +469,7 @@ private async performStatusToggle(material: Material, action: string) {
       try {
         if (this.adjustmentType === 'ingreso') {
           await this.movementService.registerEntry(this.selectedMaterial.id, quantity, notes).toPromise();
+          await this.materialService.updateMaterialStock(this.selectedMaterial, quantity).toPromise();
           await this.showToast('Ingreso registrado exitosamente', 'success');
         } else {
           if (this.selectedMaterial.currentStock < quantity) {
@@ -474,17 +477,17 @@ private async performStatusToggle(material: Material, action: string) {
             await loading.dismiss();
             return;
           }
-
-          await this.materialService.updateMaterialStock(this.selectedMaterial.id, -quantity).toPromise();
+          await this.movementService.registerEntry(this.selectedMaterial.id, -quantity, notes).toPromise();
+          await this.materialService.updateMaterialStock(this.selectedMaterial, -quantity).toPromise();
           await this.showToast('Salida registrada exitosamente', 'success');
         }
-
         this.loadMaterials();
         this.closeStockAdjustment();
       } catch (error: any) {
         await this.showToast(error.message || 'Error al ajustar el stock', 'danger');
       } finally {
         await loading.dismiss();
+        this.isSubmittingStockAdjustment = false;
       }
     } else {
       await this.showToast('Por favor, completa todos los campos requeridos', 'warning');

@@ -93,6 +93,16 @@
           (click)="adjustStock(material); $event.stopPropagation()">
           <ion-icon name="cube"></ion-icon>
         </ion-button>
+        <!-- Botón rojo para eliminar material -->
+        <ion-button 
+          *ngIf="canEditMaterial()"
+          slot="end"
+          fill="solid"
+          color="danger"
+          style="margin-left: 8px;"
+          (click)="deleteMaterial(material); $event.stopPropagation()">
+          <ion-icon name="trash" slot="icon-only"></ion-icon>
+        </ion-button>
       </ion-item>
 
       <!-- Opciones deslizantes -->

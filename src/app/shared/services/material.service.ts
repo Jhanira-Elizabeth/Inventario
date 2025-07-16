@@ -169,29 +169,22 @@ export class MaterialService {
     );
   }
 
-  updateMaterialStock(id: string, quantityChange: number): Observable<void> {
-    console.log('[DEBUG] updateMaterialStock called', { id, quantityChange });
-    return this.getMaterials().pipe(
-      map(materials => materials.find(m => m.id === id)),
-      switchMap((material: Material | undefined) => {
-        console.log('[DEBUG] updateMaterialStock - got material', material);
-        if (!material) {
-          console.error('[DEBUG] updateMaterialStock - material not found');
-          throw new Error('Material no encontrado');
-        }
-        const newStock = material.currentStock + quantityChange;
-        console.log('[DEBUG] updateMaterialStock - newStock', newStock);
-        if (newStock < 0) {
-          console.error('[DEBUG] updateMaterialStock - intento de guardar stock negativo, operación cancelada');
-          throw new Error('Stock insuficiente');
-        }
-        // NO recargar materiales aquí para evitar bucle
-        return this.updateMaterial(id, { currentStock: newStock }).pipe(
-          map(() => {
-            console.log('[DEBUG] updateMaterialStock - stock updated');
-            return;
-          })
-        );
+  // Removed old updateMaterialStock(id: string, ...) implementation
+  /**
+   * Update material stock directly, avoiding observable-based loops.
+   */
+  updateMaterialStock(material: Material, quantityChange: number): Observable<void> {
+    console.log('[DEBUG] updateMaterialStock called', { id: material.id, quantityChange });
+    const newStock = material.currentStock + quantityChange;
+    console.log('[DEBUG] updateMaterialStock - newStock', newStock);
+    if (newStock < 0) {
+      console.error('[DEBUG] updateMaterialStock - intento de guardar stock negativo, operación cancelada');
+      throw new Error('Stock insuficiente');
+    }
+    return this.updateMaterial(material.id, { currentStock: newStock }).pipe(
+      map(() => {
+        console.log('[DEBUG] updateMaterialStock - stock updated');
+        return;
       })
     );
   }
@@ -203,33 +196,17 @@ export class MaterialService {
       console.log('MaterialService.loadMaterials - Materiales obtenidos de DB:', materials.length);
       
       const mappedMaterials = materials.map(m => {
-        if (m.name.includes('Cable UTP Cat 6')) {
-          console.log(`MaterialService.loadMaterials - ${m.name} datos completos de DB:`, m);
-          console.log(`MaterialService.loadMaterials - ${m.name} estado en DB:`, m.isActive, 'tipo:', typeof m.isActive);
-        }
-        
-        const mapped: Material = {
-          id: m.id,
-          code: m.code,
-          name: m.name,
-          description: m.description,
-          category: m.category,
-          unit: m.unit,
-          price: m.price,
-          currentStock: m.currentStock,
-          minimumStock: m.minimumStock,
-          maximumStock: m.maximumStock,
-          location: m.location,
+        const mapped = {
+          ...m,
           supplierId: m.supplierId,
-          // CORREGIDO: Asegurar que isActive se mantenga como booleano verdadero
           isActive: Boolean(m.isActive),
           qrCode: m.qrCode,
           barcode: m.barcode,
           createdAt: typeof m.createdAt === 'string' ? new Date(m.createdAt) : m.createdAt,
           updatedAt: typeof m.updatedAt === 'string' ? new Date(m.updatedAt) : m.updatedAt
         };
-        
         if (m.name.includes('Cable UTP Cat 6')) {
+          console.log(`MaterialService.loadMaterials - ${m.name} datos completos de DB:`, m);
           console.log(`MaterialService.loadMaterials - ${m.name} evaluación isActive:`, {
             original: m.isActive,
             originalType: typeof m.isActive,
@@ -237,7 +214,6 @@ export class MaterialService {
             booleanConversion: Boolean(m.isActive)
           });
         }
-        
         return mapped;
       });
       

@@ -52,8 +52,7 @@ import {
   close,
   calendar,
   person,
-  business
-} from 'ionicons/icons';
+  business, trash } from 'ionicons/icons';
 import { MovementService } from '../shared/services/movement.service';
 import { MaterialService } from '../shared/services/material.service';
 import { WorkService } from '../shared/services/work.service';
@@ -97,6 +96,41 @@ import { User } from '../shared/models/user.model';
   ]
 })
 export class InventoryMovementsPage implements OnInit, OnDestroy {
+  // Elimina un material por ID y recarga la lista, con confirmación
+  async deleteMaterial(materialId: string) {
+    const material = this.materials.find(m => m.id === materialId);
+    const nombre = material ? material.name : 'este material';
+    const alert = await this.alertController.create({
+      header: '¿Eliminar material?',
+      message: `¿Estás seguro de que deseas eliminar <b>${nombre}</b>? Esta acción no se puede deshacer.`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            try {
+              await this.materialService.deleteMaterial(materialId).toPromise();
+              if (typeof this.materialService.loadMaterials === 'function') {
+                await this.materialService.loadMaterials();
+              }
+              // Actualizar la lista local
+              const materialesActualizados = await this.materialService.getMaterials().toPromise();
+              this.materials = (materialesActualizados || []).filter(m => m.isActive);
+              this.cdRef.detectChanges();
+              await this.showSuccessToast('Material eliminado correctamente');
+            } catch (error) {
+              await this.showErrorToast('Error al eliminar el material');
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
   private isLoadingData = false;
   public isRegisteringMovement = false;
   private isStockBeingUpdated = false;
@@ -149,10 +183,7 @@ export class InventoryMovementsPage implements OnInit, OnDestroy {
     private loadingController: LoadingController,
     private cdRef: ChangeDetectorRef
   ) {
-    addIcons({ 
-      add, remove, search, swapHorizontal, trendingUp, trendingDown, 
-      cube, checkmark, close, calendar, person, business 
-    });
+    addIcons({close,trash,add,remove,search,swapHorizontal,trendingUp,trendingDown,cube,checkmark,calendar,person,business});
     
     this.movementForm = this.fb.group({
       materialId: ['', Validators.required],
@@ -335,7 +366,7 @@ export class InventoryMovementsPage implements OnInit, OnDestroy {
       await this.materialService.createMaterial({
         id: 'material-demo',
         name: 'Material Demo',
-        code: 'DEMO-001',
+        code: 'DEMO-002',
         description: 'Material de ejemplo para pruebas',
         category: 'General',
         unit: 'unidad',

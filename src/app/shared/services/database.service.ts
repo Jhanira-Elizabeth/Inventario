@@ -279,25 +279,18 @@ export class DatabaseService {
     let materials = JSON.parse(localStorage.getItem('netstar_materials') || '[]');
     // Elimina materiales demo previos para evitar duplicados y asegura que al menos uno esté activo
     materials = materials.filter((m: any) => m.id !== 'material-demo');
-    materials.push({
-      id: 'material-demo',
-      code: 'DEMO-001',
-      name: 'Material Demo',
-      description: 'Material de ejemplo para pruebas',
-      category: 'General',
-      unit: 'unidad',
-      price: 0,
-      currentStock: 10,
-      minimumStock: 1,
-      maximumStock: 100,
-      location: '',
-      supplierId: '',
-      isActive: true,
-      qrCode: '',
-      barcode: '',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    });
+    for (let i = 1; i <= 3; i++) {
+      materials.push({
+        id: uuidv4(),
+        name: `Material Demo ${i}`,
+        description: `Material de ejemplo ${i}`,
+        quantity: 10 * i,
+        unit: 'unidad',
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+    }
     localStorage.setItem('netstar_materials', JSON.stringify(materials));
     // User demo
     const users = await this.getUsers();
